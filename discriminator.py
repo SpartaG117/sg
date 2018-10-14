@@ -34,7 +34,7 @@ class Discriminator(nn.Module):
         nn.init.constant_(self.linear.bias, 0.1)
 
     def _get_loss(self):
-        return
+        return nn.BCELoss(size_average=True)
 
     def forward(self, x):
         # batch_size x 1 x seq_len x emb_dim
