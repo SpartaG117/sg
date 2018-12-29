@@ -33,13 +33,13 @@ class Discriminator(nn.Module):
         nn.init.normal_(self.linear.weight, std=0.1)
         nn.init.constant_(self.linear.bias, 0.1)
 
-    def _get_loss(self):
-        return nn.BCELoss(size_average=True)
+    def get_criterion(self):
+        return nn.BCEWithLogitsLoss(size_average=True)
 
     def forward(self, x):
         # batch_size x 1 x seq_len x emb_dim
-        x = self.embed(x).unsqueeze(1)
-
+        x = self.embed(x)
+        x = x.unsqueeze(1)
         feats_conv = [F.relu(conv(x).squeeze(3)) for conv in self.convs]
         # batch_size x 1
         feats_pool = [F.max_pool1d(feat, feat.size(-1)).squeeze(2) for feat in feats_conv]
@@ -52,7 +52,7 @@ class Discriminator(nn.Module):
         output = t * h + (1 - h) * feats
 
         output = self.dropout(output)
-        output = F.sigmoid(self.linear(output))
+        output = self.linear(output)
 
         return output
 
